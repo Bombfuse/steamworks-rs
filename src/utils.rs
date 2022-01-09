@@ -58,6 +58,13 @@ impl <Manager> Utils<Manager> {
         }
     }
 
+    /// Returns whether or not steam is in big picture mode
+    pub fn is_in_big_picture_mode(&self) -> bool {
+        unsafe {
+            sys::SteamAPI_ISteamUtils_IsSteamInBigPictureMode(self.utils)
+        }
+    }
+
     /// Returns the language the steam client is currently
     /// running in.
     ///

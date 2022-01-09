@@ -5,6 +5,7 @@ extern crate bitflags;
 #[macro_use]
 extern crate lazy_static;
 
+use input::Input;
 #[cfg(feature = "raw-bindings")]
 pub use steamworks_sys as sys;
 #[cfg(not(feature = "raw-bindings"))]
@@ -46,6 +47,7 @@ mod user;
 mod user_stats;
 mod remote_storage;
 mod ugc;
+mod input;
 pub mod networking_messages;
 pub mod networking_types;
 pub mod networking_sockets;
@@ -268,6 +270,15 @@ impl<Manager> Client<Manager> {
                 utils: utils,
                 _inner: self.inner.clone(),
             }
+        }
+    }
+
+    /// Returns an accessor to the steam input interface
+    pub fn input(&self) -> Input<Manager> {
+        unsafe {
+            let input = sys::SteamAPI_SteamInput_v002();
+            debug_assert!(!input.is_null());
+            Input { input, inner: self.inner.clone() }
         }
     }
 
