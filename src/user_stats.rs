@@ -148,6 +148,43 @@ impl <Manager> UserStats<Manager> {
         }
     }
 
+    pub fn set_achievement<T: Into<String>>(&self, achievement_name: T) -> Result<(), String> {
+        unsafe {
+            let name = CString::new(achievement_name.into()).unwrap();
+            if !sys::SteamAPI_ISteamUserStats_SetAchievement(self.user_stats, name.as_ptr()) {
+                return Err(String::from("Unable to store stats."));
+            }
+
+            Ok(())
+        }
+    }
+
+    pub fn set_stat_float<T: Into<String>>(&self, achievement_name: T, score: f32) -> Result<(), String> {
+        unsafe {
+            let name = CString::new(achievement_name.into()).unwrap();
+            let set_state = sys::SteamAPI_ISteamUserStats_SetStatFloat(self.user_stats, name.as_ptr(), score);
+            
+            if !set_state {
+                return Err(String::from("Unable to set achievement"));
+            }
+
+            Ok(())
+        }
+    }
+
+    pub fn set_stat_int<T: Into<String>>(&self, achievement_name: T, score: i32) -> Result<(), String> {
+        unsafe {
+            let name = CString::new(achievement_name.into()).unwrap();
+            let set_state = sys::SteamAPI_ISteamUserStats_SetStatInt32(self.user_stats, name.as_ptr(), score);
+
+            if !set_state {
+                return Err(String::from("Unable to set achievement"));
+            }
+
+            Ok(())
+        }
+    }
+
     /// Returns the display type of a leaderboard handle. Returns `None` if the leaderboard handle is invalid.
     pub fn get_leaderboard_display_type(&self, leaderboard: &Leaderboard) -> Option<LeaderboardDisplayType> {
         unsafe {

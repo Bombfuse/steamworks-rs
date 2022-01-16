@@ -12,6 +12,8 @@ pub struct InputDigitalActionHandle(pub(crate) u64);
 #[derive(Clone, Copy)]
 pub struct InputActionSetHandle(pub(crate) u64);
 
+pub const STEAM_INPUT_MAX_COUNT: u8 = 16;
+
 pub struct Input<Manager> {
     pub(crate) input: *mut sys::ISteamInput,
     pub(crate) inner: Arc<Inner<Manager>>,
@@ -33,6 +35,22 @@ impl<Manager> Input<Manager> {
             let state = digital_action_data.bActive;
             let active = digital_action_data.bState;
             InputDigitalActionData { state, active }
+        }
+    }
+
+    pub fn get_connected_controllers(&self) -> Vec<u64> {
+        unsafe {
+            let mut handles_out: [u64; STEAM_INPUT_MAX_COUNT as usize] = std::mem::zeroed();
+            let handle_count = sys::SteamAPI_ISteamInput_GetConnectedControllers(self.input, handles_out.as_mut_ptr());
+
+            let mut handles = Vec::new();
+
+            for i in 0..handle_count {
+                let controller_id = handles_out[i as usize];
+                handles.push(controller_id);
+            }
+
+            handles
         }
     }
 
