@@ -148,6 +148,19 @@ impl <Manager> UserStats<Manager> {
         }
     }
 
+    pub fn get_achievement<T: Into<String>>(&self, achievement_name: T) -> Result<bool, String> {
+        unsafe {
+            let achievement_name: String = achievement_name.into();
+            let name = CString::new(achievement_name.clone()).unwrap();
+            let mut achieved = false;
+            if !sys::SteamAPI_ISteamUserStats_GetAchievement(self.user_stats, name.as_ptr(), &mut achieved) {
+                return Err(format!("Unable to get achievement {:?}.", achievement_name));
+            }
+
+            Ok(achieved)
+        }
+    }
+
     pub fn set_achievement<T: Into<String>>(&self, achievement_name: T) -> Result<(), String> {
         unsafe {
             let name = CString::new(achievement_name.into()).unwrap();
